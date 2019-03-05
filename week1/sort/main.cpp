@@ -13,8 +13,8 @@ int main() {
   quickSort(array, 0, 9);
   
   cout << "------output------" << endl;
-  for (int a : array) {
-    cout << a << endl;
+  for (int i = 0; i < 10; i++) {
+    cout << array[i] << endl;
   }
 
   return 0;

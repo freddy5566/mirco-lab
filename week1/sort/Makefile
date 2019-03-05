@@ -9,6 +9,6 @@ SRCS=main.cpp sort.cpp
 
 all: $(FILE) 
 $(FILE): $(FILE).o $(OBJS)	
-				$(CC) $(CFLAGS) $(SRCS) -o $  $(FILE).o $(OBJS) $(LIBS)
+				$(CC) $(CFLAGS) $(INCLUDES) -o $@ $(FILE).o $(OBJS) $(LIBS)
 clean:
 			rm *.o $(FILE)
