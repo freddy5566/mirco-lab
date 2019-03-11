@@ -1,11 +1,11 @@
 FILE=main
-CFLAGS=-Wall -g 
-CC=gcc
+CFLAGS=-Wall -g
+CROSS_COMPILE=arm-linux-gnueabihf
+CC= $(CROSS_COMPILE)cc
 LIBS=-lm
 INCLUDES= 
-OBJS=sort.o
-SRCS=main.cpp sort.cpp
-
+OBJS=
+SRCS=main.cpp
 
 all: $(FILE) 
 $(FILE): $(FILE).o $(OBJS)	
