@@ -12,7 +12,7 @@ int gpio_export(unsigned int gpio){
 	int fd, len;
 	char buf[64];
 	
-	fd = open("/sys/class/gpio/export", 0_WRONLY);
+	fd = open("/sys/class/gpio/export", O_WRONLY);
 	if (fd<0) {
 		perror("gpio/export");
 		return fd;
@@ -28,7 +28,7 @@ int gpio_unwxport(unsigned int gpio){
 	int fd, len;
 	char buf[64];
 	
-	fd = open("/sys/class/gpio/export", 0_WRONLY);
+	fd = open("/sys/class/gpio/export", O_WRONLY);
 	if (fd<0) {
 		perror("gpio/export");
 		return fd;
@@ -46,7 +46,7 @@ int gpio_set_dir(unsigned int gpio, string dirStatus){
 	char buf[64];
 
 	snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio%d/direction", gpio);
-	fd = open(buf, 0_WRONLY);
+	fd = open(buf, O_WRONLY);
 	if (fd<0){
 		perror("gpio/direction");
 		return fd;
@@ -68,7 +68,7 @@ int gpio_set_value(unsigned int gpio, int value) {
 	char buf[64];
 
 	snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio%d/value", gpio);
-	fd = open(buf, 0_WRONLY);
+	fd = open(buf, O_WRONLY);
 
 	if (fd<0){
 			perror("gpio/direction");
@@ -90,10 +90,11 @@ int gpio_set_value(unsigned int gpio, int value) {
 int main(int argc, char *argv[]) {
 	
 	if (argv[1] != "Mode_Shine") {
-		gpio_export(argv[1]);
-		gpio_set_dir(argv[1], "out");
+		int gpio = atoi(argv[1]);
+		gpio_export(gpio);
+		gpio_set_dir(gpio, "out");
 		int value = argv[2] == "on" ? 1 : 0;
-		gpio_set_value(argv[1], value);
+		gpio_set_value(gpio, value);
 	} else {
 
 	}
