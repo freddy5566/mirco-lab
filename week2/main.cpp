@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <map>
 
 using namespace std;
 
@@ -87,16 +88,61 @@ int gpio_set_value(unsigned int gpio, int value) {
 	
 }
 
+void setup_gpio() {
+	gpio_export(166);
+	gpio_export(164);
+	gpio_export(162);
+	gpio_export(160);
+	gpio_set_dir(166, "out");
+	gpio_set_dir(164, "out");
+	gpio_set_dir(162, "out");
+	gpio_set_dir(160, "out");
+}
+
+void shine(int times) {
+	int value = 1;	
+	for (int i = 0; i < times; i++) {
+		cout << "value = " << value << endl;
+		cout << "!value = " << !value << endl; 
+		gpio_set_value(166, value);
+		gpio_set_value(164, value);
+		gpio_set_value(162, !value);
+		gpio_set_value(160, !value);
+		value = !value;
+		sleep(1);
+		}
+}
+
 int main(int argc, char *argv[]) {
-	
-	if (argv[1] != "Mode_Shine") {
-		int gpio = atoi(argv[1]);
+	string commend = string(argv[1]);
+	map<string, int> Leds;
+	Leds["LED1"] = 166;
+	Leds["LED2"] = 164;
+	Leds["LED3"] = 162;
+	Leds["LED4"] = 160;
+	if (commend.compare("Mode_Shine")) {
+		int gpio = Leds[argv[1]];
+		string action = string(argv[2]);
+		
 		gpio_export(gpio);
 		gpio_set_dir(gpio, "out");
-		int value = argv[2] == "on" ? 1 : 0;
-		gpio_set_value(gpio, value);
-	} else {
+		
+		int value = !action.compare("on") ? 1 : 0;
 
+		cout << "gpio = " << gpio << endl;
+		cout << "argv[2] = " << argv[2] << endl;
+		cout << "value = " << value << endl;
+		cout << "gpio = " << gpio << endl;
+
+		gpio_set_value(gpio, value);
+
+	} else {
+		cout << "Mode_Shine start..." << endl;
+		setup_gpio();
+
+		int times = atoi(argv[2]);
+		cout << "times = " << times << endl;
+		shine(times);
 	}
 
 	return 0;
