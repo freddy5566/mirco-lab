@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>////</title>
+</head>
+
+<body>
+	<h1 style="color: blue;">Test CGI</h1>
+	<hr>
+	<form action="/cgi-bin/submit.cgi">
+		<!-- 		 -->
+		<div>
+			<p>chooese one:
+				<input type="radio" name="login" value="studentID">student ID
+				<input type="radio" name="login" value="name">name
+			</p>
+			<p>
+				Content: <input type="text" name="logincontent" value="">
+			</p>
+			<hr>
+		</div>
+		<p>LED ON</p>
+		<div style="margin-right: 650px; padding: 10px; border: black 1px solid; border-radius: 10px;">
+			<p>
+				<input type="checkbox" name="control1" value="first">1st led<br>
+			</p>
+			<p>
+				<input type="checkbox" name="control2" value="second">2nd led<br>
+			</p>
+			<p>
+				<input type="checkbox" name="control3" value="third">3rd led<br>
+			</p>
+			<p>
+				<input type="checkbox" name="control4" value="fourth">4th led<br>
+			</p>
+		</div>
+		<hr>
+		<p>Shine Mode</p>
+		<div style="margin-right: 650px; padding: 10px; border: black 1px solid; border-radius: 10px;">
+			<p>Frequency</p>
+			<p><input type="text" name="frequency" value="" placeholder="type in frequency" style="width: 100px;"></p>
+			<p>
+				<input type="radio" name="onoff" value="on">ON
+				<input type="radio" name="onoff" value="off">OFF
+			</p>
+		</div>
+		<br>
+
+		<input type="submit" value="Submit" name="S">
+	</form>
+</body>
+
+</html>
