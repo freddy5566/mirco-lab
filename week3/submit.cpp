@@ -120,32 +120,68 @@ int main() {
 	Leds["LED3"] = 162;
 	Leds["LED4"] = 160;
 
+	
 	char *data;
 	long m, n;
-
+	setup_gpio();
 	cout << "Content-type: text/html\n\n" << endl;
 	cout << "<html><head><title>test</title></head>\n" << endl;
 	
-	data = getenv(""QUERY_STRING);
+	data = getenv("QUERY_STRING");
 
 	char myContent[128];
 
 	if (strstr(data, "studentID"))
 	{
-		sscanf(data, "login=studentID&Text=%[a-zA-A0-9]&S=Submit", &myContent);
-		cout << "<p>選項: 學號</p>" << endl;
-		cout << "<p>內容: " << myContent << "</p>" << endl;
+		sscanf(data, "login=studentID&logincontent=%[a-zA-A0-9]&onoff=on&S=Submit", &myContent);
+		printf("<p>選項: 學號</p>\n\n");
+		printf("<p> content: %s <p>", myContent);
 	}
 	else if (strstr(data, "name"))
 	{
-		sscanf(data, "login=name&Text=%[a-zA-A0-9]&S=Submit", &myContent);
-		cout << "<p>選項: 姓名</p>" << endl;
-		cout << "<p>內容: " << myContent << "</p>" << endl;
+		sscanf(data, "login=name&logincontent=%[a-zA-A0-9]&S=Submit", &myContent);
+		printf("<p>選項: 姓名</p>\n\n");
+		printf("<p> content: %s<p>", myContent);
+	}
+	else if (strstr(data, "control1"))
+	{
+				sscanf(data, "controlLED=first&S=Submit", &myContent);
+				
+				gpio_set_value(166, 1);
+				printf("<p>LED1 on</p>\n\n");
+	}
+		else if (strstr(data, "control2"))
+	{
+				sscanf(data, "controlLED=second&S=Submit", &myContent);
+				
+				gpio_set_value(164, 1);
+				printf("<p>LED2 on</p>\n\n");
+	}
+		else if (strstr(data, "control3"))
+	{
+				sscanf(data, "controlLED=third&S=Submit", &myContent);
+				
+				gpio_set_value(162, 1);
+				printf("<p>LED3 on</p>\n\n");
+	}
+		else if (strstr(data, "control4"))
+	{
+				sscanf(data, "controlLED=fourth&S=Submit", &myContent);
+				
+				gpio_set_value(160, 1);
+				printf("<p>LED4 on</p>\n\n");
+	}
+	else if (strstr(data, "frequency"))
+	{
+			sscanf(data, "frequency=%[0-9]&onoff=on&S=Submit", &myContent);
+			shine(myContent[0] - '0');
+			printf("<p>Shine mode: frequency is %s</p>", &myContent);
 	}
 	else
 	{
 		cout << "error" << endl;
 	}
+
 
 	return 0;
 
