@@ -23,17 +23,18 @@ int gpio_export(unsigned int gpio){
     char buf[64];
 	
     fd = filp_open("/sys/class/gpio/export", O_WRONLY, 0);
-	printk("open file!!!\n");
+	//printk("open file!!!\n");
 
     len = snprintf(buf, sizeof(buf), "%d", gpio);
     vfs_write(fd, buf ,len, &pos);
     filp_close(fd, NULL); //close file
-
+	
+	
+set_fs(old_fs);
     return 0;
-	set_fs(old_fs);
 }
 
-int gpio_unwxport(unsigned int gpio){
+int gpio_unexport(unsigned int gpio){
 	struct file *fd;    
 	loff_t pos = 0;
 	mm_segment_t old_fs;
@@ -42,9 +43,9 @@ int gpio_unwxport(unsigned int gpio){
 	int len;
     char buf[64];
 
-    fd = filp_open("/sys/class/gpio/export", O_WRONLY, 0);
- 
+    fd = filp_open("/sys/class/gpio/unexport", O_WRONLY, 0);
     len = snprintf(buf, sizeof(buf), "%d", gpio);
+ 	printk("buf:%s \n", buf);
     vfs_write(fd, buf ,len, &pos);
     filp_close(fd, NULL); //close file
 	set_fs(old_fs);
@@ -61,10 +62,12 @@ int gpio_set_dir(unsigned int gpio, char* dirStatus){
 	set_fs(get_ds());
     char buf[64];
 
-    snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio%d/direction", gpio);
+    
+	snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio%d/direction", gpio);
+ 	printk("buf:%s \n", buf);
     fd = filp_open(buf, O_WRONLY, 0);
 
-    if (strcmp("out", dirStatus)){
+    if (!strcmp("out", dirStatus)){
         vfs_write(fd, "out", 4, &pos);
     }
     else
@@ -75,47 +78,30 @@ int gpio_set_dir(unsigned int gpio, char* dirStatus){
     return 0;
 }
 
-void gpio_print_result(int value, char[] LED) {
-	char onOrOff[10];
-	onOrOff = value == 1 ? "on" ? "off";
-	printk("%s %s\n", value, onOrOff);
-}
 
 int gpio_set_value(unsigned int gpio, int value) {
-    struct file *fd;   
+    	struct file *fp;   
 	loff_t pos = 0;
 	mm_segment_t old_fs;
+	//char buff[10] = { "1231321"};
 	old_fs = get_fs();
 	set_fs(get_ds());
-    char buf[64];
-	
-    switch (gpio) {
-    case 166:
-		gpio_print_result(value, "LED1");
-        break;
-    case 164:
-        gpio_print_result(value, "LED2");
-        break;
-    case 162:
-		gpio_print_result(value, "LED3");
-        break;
-    case 160:
-		gpio_print_result(value, "LED4");
-        break;
-    default:
-        break;
-    }
 
-    snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio%d/value", gpio);
-    fd = filp_open(buf, O_WRONLY, 0);
 
-    if (value == 0)
-        vfs_write(fd, "0", 2, &pos);
-    else
-        vfs_write(fd, "1", 2, &pos);
+  	char buf[64];
 
-    filp_close(fd, NULL);
+    	snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio%d/value", gpio);
+
+	fp = filp_open(buf, O_WRONLY, 0);
+	printk("buf: %s \n", buf);
+	if (value == 0)
+        	vfs_write(fp, "0", 2, &pos);
+    	else
+        	vfs_write(fp, "1", 2, &pos);
+
+	filp_close(fp, NULL);
 	set_fs(old_fs);
+
     return 0;
 }
 
@@ -131,46 +117,66 @@ static ssize_t drv_read(struct file *filp, char *buf, size_t count, loff_t *ppos
 static ssize_t drv_write(struct file *filp, char *buf, size_t count, loff_t *ppos)
 {
 	printk("device write\n");
-	printk("%d\n", iCount);
+	/**printk("%d\n", iCount);
 	printk("W_buf_size: %d\n", (int)count);
-
+**/
 	copy_from_user(userChar, buf, count);
 	userChar[count - 1] = 0;
 	printk("userChar(chr): %s\n", userChar);
-	printk("userChar(int): %d\n", (int)sizeof(userChar));
+//	printk("userChar(int): %d\n", (int)sizeof(userChar));
 
-    strcat(userChar," 107598024");
+ //   strcat(userChar," 107598024");
 
-    printk("%s\n",userChar);
+   	 printk("%s\n",userChar);
 	iCount++;	
 	
+	//gpio_unexport(166);
 	gpio_export(166);
-    gpio_export(164);
-    gpio_export(162);
-    gpio_export(160);
-    gpio_set_dir(166, "out");
-    gpio_set_dir(164, "out");
-    gpio_set_dir(162, "out");
-    gpio_set_dir(160, "out");
+    	gpio_export(164);
+    	gpio_export(162);
+    	gpio_export(160);
+    	gpio_set_dir(166, "out");
+    	gpio_set_dir(164, "out");
+    	gpio_set_dir(162, "out");
+    	gpio_set_dir(160, "out");
 
 	char LED[99];
 	char action;
 	int i = 0;
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < 4; i++)
 	{
-		LED[i] = buf[i];
+		LED[i] = userChar[i];
 	}
 
-	action = buf[3];
+	action = userChar[5];
 
-	printk("LED:%s\n action: %s\n", LED, action);
+	printk("LED:%s\n action: %c\n", LED, action);
 
-	long* gpio;
-	kstrtol(LED, 10, gpio);
-	gpio_set_dir(*gpio, "out");
-	gpio_set_value(*gpio, action -'0');
+	int gpio = 0;
+
+	switch (LED[3]) {
+	case '1':
+		gpio = 166;
+		break;
+	case '2':
+		gpio = 164;
+		break;
+	case '3':
+		gpio = 162;
+		break;
+	case '4':
+		gpio = 160;
+		break;
+	default:
+		break;	
+	}
+
+	int isOn = action == 'n' ? 1 : 0;
+	gpio_set_value(gpio, isOn);
+
 
     return count;
+
 }
 
 int drv_ioctl(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg)
@@ -223,6 +229,5 @@ static void demo_exit(void)
 
 module_init(demo_init);
 module_exit(demo_exit);
-
 
 
