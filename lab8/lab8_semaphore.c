@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+#include <stdlib.h>
 
 sem_t semaphore;
 int counter = 0;
@@ -112,12 +113,13 @@ void *child(void *inputArray)
 
   char *inputGPIO = inputString[0];
   char *inputValue = inputString[1];
-
-  while (1)
+ 
+	while (1)
   {
     counter++;
     sem_wait(&semaphore);
-    printf("gpio %s value %s counter %d\n", inputGPIO, inputValue, counter);
+    printf("gpio %s value %s\n", inputGPIO, inputValue);
+		gpio_set_value(atoi(inputGPIO), atoi(inputValue));
     sleep(1);
   }
 }
@@ -133,9 +135,9 @@ int main(int argc, char *argv[])
   char *input_162[] = {"162", "0"};
   char *input_160[] = {"160", "0"};
 
-  // setup_gpio();
+  setup_gpio();
 
-  printf("state %s, times %s\n", state, times);
+	printf("input_166 %s\n", input_166[0]);
 
   sem_init(&semaphore, 0, 0);
 
@@ -160,18 +162,33 @@ int main(int argc, char *argv[])
     char value_2 = isNeg ? !(state[1] - '0') + '0' : state[1];
     char value_3 = isNeg ? !(state[2] - '0') + '0' : state[2];
     char value_4 = isNeg ? !(state[3] - '0') + '0' : state[3];
+		
+		char value_1_string[] = "0";
+		char value_2_string[] = "0";
+		char value_3_string[] = "0";
+		char value_4_string[] = "0";
+	
+		value_1_string[0] = value_1;
+		value_2_string[0] = value_2;
+		value_3_string[0] = value_3;
+		value_4_string[0] = value_4;
 
-    input_166[1] = &value_1;
-    input_164[1] = &value_2;
-    input_162[1] = &value_3;
-    input_160[1] = &value_4;
+    input_166[1] = value_1_string;
+    input_164[1] = value_2_string;
+    input_162[1] = value_3_string;
+    input_160[1] = value_4_string;
+
+		printf("166 %s\n", input_166[1]);
+		printf("164 %s\n", input_164[1]);
+		printf("162 %s\n", input_162[1]);
+		printf("160 %s\n", input_160[1]);
 
     sem_post(&semaphore);
-    // sem_post(&semaphore);
-    // sem_post(&semaphore);
-    // sem_post(&semaphore);
+    sem_post(&semaphore);
+    sem_post(&semaphore);
+    sem_post(&semaphore);
 
-    sleep(4);
+    sleep(1);
   }
 
   pthread_join(t1, NULL);
